@@ -5,13 +5,13 @@
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
 
-<PageTitle>PagaDirect test application V1.0</PageTitle>
+<PageTitle>PagaDirect test application V1.1</PageTitle>
 
 <h1>PagaDirect test application!</h1>
 
 <p>
     Welcome to the PagaDirect test application.<br>
-    PagaDirect API documentation <a href="https://secure.pagadirect.com/api-docs" target="_new">here</a>.<br><br>>
+    PagaDirect API documentation <a href="https://secure.pagadirect.com/api-docs" target="_new">here</a>.<br><br>
     This sample does not use the callback functionality of PagaDirect<br>
     If you use the callback functionality and want to test on localhost, use <a href="https://ngrok.com/">ngrok</a> to redirect the callback to localhost<br>
 
@@ -28,27 +28,36 @@
 
 <br>
 <br>
+<h1>PagaDirect settings</h1>
 <p>Pagadirect base endpoint <input type="text" class="form-control" @bind="@PagaDirectEndpoint" /></p>
 <p>PagaDirect API key<input type="text" class="form-control" @bind="@PagaDirectAPIKey" /></p>
+<p>Reponse and log information<input type="text" class="form-control" @bind="@Info" /></p>
 
+<h1>PagaDirect get payment methods</h1>
+<p><button class="btn btn-info" @onclick="GetPaymentMethods">Get the PagaDirect payment methods of this API key</button></p>
+
+<h2>PagaDirect GetPayments response</h2>
+<p>Success<input type="text" class="form-control" @bind="@PaymentMethodsSuccess" /></p>
+<p>Methods<input type="text" class="form-control" @bind="@PaymentMethods" /></p>
+
+<h1>PagaDirect transaction test data</h1>
 <p>Amount<input type="number" class="form-control" @bind="@Amount" /></p>
 <p>Reference (which is used to seek the transaction)<input type="text" class="form-control" @bind="@Reference" /></p>
 <p>Return URL. This URL will be called after the transaction completed and you can check if the transactiuon was succesful<input type="text" class="form-control" @bind="@ReturnURL" /></p>
-
-<p>Logging info<input type="text" class="form-control" @bind="@Info" /></p>
-
 <p><button class="btn btn-info" @onclick="StartPayment">Start PagaDirect Gateway</button></p>
 
-<h1>PagaDirect Gateway response</h1>
+<h2>PagaDirect Gateway response</h2>
 <p>Succes<input type="text" class="form-control" @bind="@GatewaySuccess" /></p>
 <p>Transaction Id<input type="text" class="form-control" @bind="@GatewayTransactionId" /></p>
 <p>Redirect URL<input type="text" class="form-control" @bind="@GatewayRedirectURL" /></p>
 
+<h1>PagaDirect start payment page</h1>
 <p><button class="btn btn-info" @onclick="StartRedirectURL">Start the redirect URL / PagaDirect Payment Window</button></p>
 
+<h1>PagaDirect get transaction status and information</h1>
 <p><button class="btn btn-info" @onclick="CheckTransaction">Check the status of the transaction</button></p>
 
-<h1>PagaDirect Transaction response</h1>
+<h2>PagaDirect Transaction response</h2>
 <p>Success<input type="text" class="form-control" @bind="@TransactionSuccess" /></p>
 <p>TransactionId<input type="text" class="form-control" @bind="@TransactionTransactionId" /></p>
 <p>Token<input type="text" class="form-control" @bind="@TransactionToken" /></p>
@@ -59,14 +68,17 @@
 
 @code 
 {
-
     private string Info = "";
 
-    private string PagaDirectAPIKey = "Put your PagaDirect API key here! - 3|tCGWLY69PvIQXIxkxzVcvxtsJP1CGIcJwPZnAej6";
+//    private string PagaDirectAPIKey = "Put your PagaDirect API key here! - 3|tCGWLY69PvIQXIxkxzVcvxtsJP1CGIcJwPZnAej6";
+    private string PagaDirectAPIKey = "3|tCGWLY69PvIQXIxkxzVcvxtsJP1CGIcJwPZnAej6";
     private decimal Amount = 10.0m;
     private string Reference = "Test PagaDirect Payment: Reference=INVOICE001";
     private string ReturnURL = "https://www.pagadirect.com";
     private string PagaDirectEndpoint = "https://test-api.pagadirect.com/api/";
+
+    private string PaymentMethodsSuccess = "";
+    private string PaymentMethods = "";
 
     private string GatewaySuccess = "";
     private string? GatewayTransactionId = "";
@@ -88,72 +100,79 @@
     {
         bool lGo = true;
 
-        // Check if we can pay!
-        if (Amount == 0)
-        {
-            Info="Amount is zero, no payment needed!";
-            lGo = false;
-        }
-        else if (!HTMLHelper.IsValidUrl(ReturnURL))
-        {
-            Info = "The return URL is not a valid URL";
-            lGo = false;
-        }
-
-        if (lGo)
+        try
         {
 
-            // Set the payment data
-            PagaDirectPaymentDataModel pagaDirectPaymentData = new PagaDirectPaymentDataModel();
-            pagaDirectPaymentData.PagaDirectEndpoint = PagaDirectEndpoint;
-            pagaDirectPaymentData.PagaDirectApiKey = PagaDirectAPIKey;
-            pagaDirectPaymentData.Amount = Amount;
-            pagaDirectPaymentData.Reference = Reference;
-            pagaDirectPaymentData.ReturnUrl = ReturnURL;
-
-            // Init a payment
-            var response = await httpDefaultClient.PostAsJsonAsync("PagaDirect/InitiatePayment", @pagaDirectPaymentData);
-
-            if (response.IsSuccessStatusCode)
+            // Check if we can pay!
+            if (Amount == 0)
             {
-                PagaDirectPaymentResultModel? pagaDirectPaymentResult = await response.Content.ReadFromJsonAsync<PagaDirectPaymentResultModel>();
+                Info = "Amount is zero, no payment needed!";
+                lGo = false;
+            }
+            else if (!HTMLHelper.IsValidUrl(ReturnURL))
+            {
+                Info = "The return URL is not a valid URL";
+                lGo = false;
+            }
 
-                if (pagaDirectPaymentResult == null)
+            if (lGo)
+            {
+
+                // Set the payment data
+                PagaDirectPaymentDataModel pagaDirectPaymentData = new PagaDirectPaymentDataModel();
+                pagaDirectPaymentData.PagaDirectEndpoint = PagaDirectEndpoint;
+                pagaDirectPaymentData.PagaDirectApiKey = PagaDirectAPIKey;
+                pagaDirectPaymentData.Amount = Amount;
+                pagaDirectPaymentData.Reference = Reference;
+                pagaDirectPaymentData.ReturnUrl = ReturnURL;
+
+                // Init a payment
+                var response = await httpDefaultClient.PostAsJsonAsync("PagaDirect/InitiatePayment", @pagaDirectPaymentData);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    Info = "Payment creation failed! (null)";
+                    PagaDirectPaymentResultModel? pagaDirectPaymentResult = await response.Content.ReadFromJsonAsync<PagaDirectPaymentResultModel>();
+
+                    if (pagaDirectPaymentResult == null)
+                    {
+                        Info = "Payment creation failed! (null)";
+                    }
+                    else
+                    {
+                        // We have a valid return object!
+                        if (!pagaDirectPaymentResult.success)
+                        {
+                            Info = "Payment creation failed!(unsuccesful)";
+                        }
+                        else if (pagaDirectPaymentResult.redirect_url == null || pagaDirectPaymentResult.redirect_url.Length == 0)
+                        {
+                            Info = "Payment creation failed! (no redirect url)";
+                        }
+
+                        // Get the data
+                        GatewaySuccess = pagaDirectPaymentResult.success.ToString();
+                        GatewayTransactionId = pagaDirectPaymentResult.transaction_id;
+                        GatewayRedirectURL = pagaDirectPaymentResult.redirect_url;
+                    }
                 }
                 else
                 {
-                    // We have a valid return object!
-                    if (!pagaDirectPaymentResult.success)
-                    {
-                        Info = "Payment creation failed!(unsuccesful)";
-                    }
-                    else if (pagaDirectPaymentResult.redirect_url == null || pagaDirectPaymentResult.redirect_url.Length == 0)
-                    {
-                        Info = "Payment creation failed! (no redirect url)";
-                    }
-
-                    // Get the data
-                    GatewaySuccess = pagaDirectPaymentResult.success.ToString();
-                    GatewayTransactionId = pagaDirectPaymentResult.transaction_id;
-                    GatewayRedirectURL = pagaDirectPaymentResult.redirect_url;
+                    Info = "Pagadirect Gateway not initialized : " + response.Content.ReadAsStringAsync();
                 }
             }
-            else
-            {
-                Info = "Pagadirect Gateway not niitialized : " + response.Content.ReadAsStringAsync();    
-            }
-            // Refresh the page
-            StateHasChanged();
         }
+        catch (Exception ex)
+        {
+            Info = $"PagaDirect create payment error! - {ex.Message}";
+        }
+        StateHasChanged();
     }
 
     /// <summary>
     /// Start the redirectURL
     /// </summary>
     /// <returns></returns>
-    private async Task StartRedirectURL()
+    private async Task StartRedirectURLOld()
     {
         // Redirect
         if (HTMLHelper.IsValidUrl(GatewayRedirectURL!))
@@ -161,6 +180,20 @@
             await JSRuntime.InvokeVoidAsync("open", GatewayRedirectURL, "_blank");
         }
     }
+
+    /// <summary>
+    /// Start the redirectURL
+    /// </summary>
+    /// <returns></returns>
+    private void StartRedirectURL()
+    {
+        // Redirect
+        if (HTMLHelper.IsValidUrl(GatewayRedirectURL!))
+        {
+            JSRuntime.InvokeAsync<object>("open", GatewayRedirectURL, "_blank");
+        }
+    }
+
 
     /// <summary>
     /// Start the redirectURL
@@ -225,7 +258,61 @@
         }
         catch (Exception ex)
         {
-            Info = $"No PagaDirect transaction found! (response not OK) - {ex.Message}";
+            Info = $"No PagaDirect transaction found! (Error) - {ex.Message}";
+            lSuccess = false;
+        }
+        StateHasChanged();
+        return lSuccess;
+    }
+
+    /// <summary>
+    /// Start the redirectURL
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> GetPaymentMethods()
+    {
+        bool lSuccess = true;
+        PagaDirectPaymentMethodsModel? pagaDirectPaymentMethods = new PagaDirectPaymentMethodsModel();
+        try
+        {
+            // Get the transaction info
+            var response = await httpDefaultClient.GetAsync($"PagaDirect/GetPaymentMethods/{PagaDirectAPIKey.Replace("/", "~")}/{PagaDirectEndpoint.Replace("/", "~")}");
+
+            if (response == null)
+            {
+                Info = "The GetPaymentMethods response is null";
+                lSuccess = false;
+            }
+            else if (response.IsSuccessStatusCode)
+            {
+                pagaDirectPaymentMethods = await response.Content.ReadFromJsonAsync<PagaDirectPaymentMethodsModel>();
+                if (pagaDirectPaymentMethods == null)
+                {
+                    Info = "No PagaDirect payment methods found! (null)";
+                    lSuccess = false;
+                }
+                else
+                {
+                    // We have a valid response object
+                    if (!pagaDirectPaymentMethods.success)
+                    {
+                        Info = "PagaDirect GetPaymentMethods failed! (unsuccesful)";
+                        lSuccess = false;
+                    }
+
+                    PaymentMethodsSuccess = pagaDirectPaymentMethods.success.ToString();
+                    PaymentMethods = string.Join(", ", pagaDirectPaymentMethods.methods!.Values); ;
+                }
+            }
+            else
+            {
+                Info = "No PagaDirect payment methods! (response not OK) : " + response.Content.ReadAsStringAsync();
+                lSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Info = $"No PagaDirect payment methods found! (Error) - {ex.Message}";
             lSuccess = false;
         }
         StateHasChanged();

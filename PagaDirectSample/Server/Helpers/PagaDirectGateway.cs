@@ -44,5 +44,13 @@ namespace SAAR3.Server.Helpers
             request.Headers.Add("PagaDirect-Api-Key", PagaDirectApiKey);
             return await DefaultHttpClient.SendAsync(request);
         }
+
+        public async Task<HttpResponseMessage> GetPaymentMethods()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{PagaDirectEndpoint}methods");
+            request.Headers.Add("PagaDirect-Api-Key", PagaDirectApiKey);
+            return await DefaultHttpClient.SendAsync(request);
+        }
+
     }
 }

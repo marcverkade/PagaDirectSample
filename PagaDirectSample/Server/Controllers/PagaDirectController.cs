@@ -124,6 +124,60 @@ namespace PagaDirect.Server.Controllers
             return "Test 123";
         }
 
+        /// <summary>
+        /// Remark: This is not safe. This should be done with body-parameters
+        /// </summary>
+        /// <param name="TransActionId"></param>
+        /// <param name="PagaDirectApiKey"></param>
+        /// <param name="PagaDirectEndpoint"></param>
+        /// <returns></returns>
+        [HttpGet("GetPaymentMethods/{PagaDirectApiKey}/{PagaDirectEndpoint}")]
+        public async Task<IActionResult> GetPaymentMethods(string PagaDirectApiKey, string PagaDirectEndpoint)
+        {
+            string sErrorText = string.Empty;
+
+            try
+            {
+                PagaDirectApiKey = PagaDirectApiKey.Replace("~", "/");
+                PagaDirectEndpoint = PagaDirectEndpoint.Replace("~", "/");
+
+                // The gateway should not be initialised here but in the Class definition so you avoid having the key as a parameter
+                _pagaDirectGateway = new PagaDirectGateway(PagaDirectApiKey, PagaDirectEndpoint);
+                var response = await _pagaDirectGateway.GetPaymentMethods();
+
+                // Handle response
+                if (response.IsSuccessStatusCode)
+                {
+                    // Get the response content
+                    PagaDirectPaymentMethodsModel? pagaDirectPaymentMethods = await response.Content.ReadFromJsonAsync<PagaDirectPaymentMethodsModel>();
+
+                    // Check if we created the payment request correctly...
+                    if (pagaDirectPaymentMethods != null)
+                    {
+                        return Ok(pagaDirectPaymentMethods);
+                    }
+                    else
+                    {
+                        // If the payment fails, you can return an error message to the user
+                        sErrorText = "PagaDirect payment methods not found!";
+                    }
+                }
+                else
+                {
+                    // If the payment fails, you can return an error message to the user
+                    sErrorText = "Could not get PagaDirect payment methods!";
+                }
+            }
+            catch (Exception ex)
+            {
+                sErrorText = $"PagaDirect gateway failed when getting payment methods!{Environment.NewLine}{ex.Message}";
+            }
+
+            // Return
+            return StatusCode(StatusCodes.Status500InternalServerError, $"{sErrorText}");
+        }
+
+
     }
 
 }
