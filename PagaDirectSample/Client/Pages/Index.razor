@@ -28,19 +28,19 @@
 
 <br>
 <br>
-<h1>PagaDirect settings</h1>
+<h1>Step 1: Enter PagaDirect settings</h1>
 <p>Pagadirect base endpoint <input type="text" class="form-control" @bind="@PagaDirectEndpoint" /></p>
 <p>PagaDirect API key<input type="text" class="form-control" @bind="@PagaDirectAPIKey" /></p>
 <p>Reponse and log information<input type="text" class="form-control" @bind="@Info" /></p>
 
-<h1>PagaDirect get payment methods</h1>
+<h1>Step 2: Get the possible PagaDirect payment methods</h1>
 <p><button class="btn btn-info" @onclick="GetPaymentMethods">Get the PagaDirect payment methods of this API key</button></p>
 
 <h2>PagaDirect GetPayments response</h2>
 <p>Success<input type="text" class="form-control" @bind="@PaymentMethodsSuccess" /></p>
 <p>Methods<input type="text" class="form-control" @bind="@PaymentMethods" /></p>
 
-<h1>PagaDirect transaction test data</h1>
+<h1>Step 3: Set transaction data and init the PagaDirect gateway</h1>
 <p>Amount<input type="number" class="form-control" @bind="@Amount" /></p>
 <p>Reference (which is used to seek the transaction)<input type="text" class="form-control" @bind="@Reference" /></p>
 <p>Return URL. This URL will be called after the transaction completed and you can check if the transactiuon was succesful<input type="text" class="form-control" @bind="@ReturnURL" /></p>
@@ -51,10 +51,10 @@
 <p>Transaction Id<input type="text" class="form-control" @bind="@GatewayTransactionId" /></p>
 <p>Redirect URL<input type="text" class="form-control" @bind="@GatewayRedirectURL" /></p>
 
-<h1>PagaDirect start payment page</h1>
+<h1>Step 4: Start PagaDirect payment (test) page</h1>
 <p><button class="btn btn-info" @onclick="StartRedirectURL">Start the redirect URL / PagaDirect Payment Window</button></p>
 
-<h1>PagaDirect get transaction status and information</h1>
+<h1>Step 5: PagaDirect get transaction status and information</h1>
 <p><button class="btn btn-info" @onclick="CheckTransaction">Check the status of the transaction</button></p>
 
 <h2>PagaDirect Transaction response</h2>
