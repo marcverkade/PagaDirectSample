@@ -172,19 +172,6 @@
     /// Start the redirectURL
     /// </summary>
     /// <returns></returns>
-    private async Task StartRedirectURLOld()
-    {
-        // Redirect
-        if (HTMLHelper.IsValidUrl(GatewayRedirectURL!))
-        {
-            await JSRuntime.InvokeVoidAsync("open", GatewayRedirectURL, "_blank");
-        }
-    }
-
-    /// <summary>
-    /// Start the redirectURL
-    /// </summary>
-    /// <returns></returns>
     private void StartRedirectURL()
     {
         // Redirect
@@ -194,9 +181,8 @@
         }
     }
 
-
     /// <summary>
-    /// Start the redirectURL
+    /// Check if the transaction is created
     /// </summary>
     /// <returns></returns>
     private async Task<bool> CheckTransaction()
@@ -213,8 +199,8 @@
             else
             {
                 // Get the transaction info
+                // "/" is prohibited in query parameters, so temporary replace with "~"
                 var response = await httpDefaultClient.GetAsync($"PagaDirect/GetTransaction/{GatewayTransactionId}/{PagaDirectAPIKey.Replace("/", "~")}/{PagaDirectEndpoint.Replace("/", "~")}");
-
                 if (response == null)
                 {
                     Info = "The CheckTransaction response is null";
@@ -266,7 +252,7 @@
     }
 
     /// <summary>
-    /// Start the redirectURL
+    /// Get the possible payment methods for this key
     /// </summary>
     /// <returns></returns>
     private async Task<bool> GetPaymentMethods()

@@ -8,6 +8,9 @@ using PagaDirect.Shared.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 
+// MLV Note that logics should be done in services and not in conrollers.
+// This is just a sample application!
+
 namespace PagaDirect.Server.Controllers
 {
     [Route("[controller]")]
@@ -16,13 +19,11 @@ namespace PagaDirect.Server.Controllers
 
     public class PagaDirectController : Controller
     {
-
         private PagaDirectGateway? _pagaDirectGateway;
-
 
         public PagaDirectController()
         {
-            // The gateway should be initilized here and not in the endpoints so you can get the key from internal routines in stead of a parameter
+            // MLV The gateway should be initilized here and not in the endpoints so you can get the key from internal routines in stead of a parameter
         }
 
         [HttpPost("InitiatePayment")]
@@ -32,7 +33,7 @@ namespace PagaDirect.Server.Controllers
 
             try
             {
-                // The gateway should not be initialised here but in the Class definition
+                // MLV The gateway should not be initialised here but in the Class definition
                 _pagaDirectGateway = new PagaDirectGateway(pagaDirectPaymentData.PagaDirectApiKey, pagaDirectPaymentData.PagaDirectEndpoint);
 
                 var response = await _pagaDirectGateway.InitiatePayment(pagaDirectPaymentData.Amount, pagaDirectPaymentData.Reference, pagaDirectPaymentData.ReturnUrl);
@@ -65,7 +66,8 @@ namespace PagaDirect.Server.Controllers
         }
 
         /// <summary>
-        /// Remark: This is not safe. This should be done with body-parameters
+        /// Retrieve a transaction
+        /// MLV Remark: This is not safe. This should be done with (encrypted) body-parameters but this is a sample...
         /// </summary>
         /// <param name="TransActionId"></param>
         /// <param name="PagaDirectApiKey"></param>
@@ -78,6 +80,7 @@ namespace PagaDirect.Server.Controllers
 
             try
             {
+                // Translate the parameters to valid values 
                 PagaDirectApiKey = PagaDirectApiKey.Replace("~", "/");
                 PagaDirectEndpoint = PagaDirectEndpoint.Replace("~", "/");
 
@@ -117,15 +120,18 @@ namespace PagaDirect.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, $"{sErrorText}");
         }
 
-
+        /// <summary>
+        /// Sample endpoint
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetTransaction")]
-        public async Task<String> GetTransaction()
+        public async Task<string> GetTransaction()
         {
-            return "Test 123";
+            return await Task.FromResult("Test 123");
         }
 
         /// <summary>
-        /// Remark: This is not safe. This should be done with body-parameters
+        /// MLV Remark: This is not safe. This should be done with body-parameters
         /// </summary>
         /// <param name="TransActionId"></param>
         /// <param name="PagaDirectApiKey"></param>
@@ -138,6 +144,7 @@ namespace PagaDirect.Server.Controllers
 
             try
             {
+                // Translate the parameters to valid values 
                 PagaDirectApiKey = PagaDirectApiKey.Replace("~", "/");
                 PagaDirectEndpoint = PagaDirectEndpoint.Replace("~", "/");
 
@@ -173,11 +180,9 @@ namespace PagaDirect.Server.Controllers
                 sErrorText = $"PagaDirect gateway failed when getting payment methods!{Environment.NewLine}{ex.Message}";
             }
 
-            // Return
+            // Return the error
             return StatusCode(StatusCodes.Status500InternalServerError, $"{sErrorText}");
         }
-
-
     }
 
 }

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagaDirectSample.Server", "PagaDirectSample\Server\PagaDirectSample.Server.csproj", "{500C2EC5-9878-46D1-82A8-659001147829}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PagaDirectSample.Server", "PagaDirectSample\Server\PagaDirectSample.Server.csproj", "{500C2EC5-9878-46D1-82A8-659001147829}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagaDirectSample.Client", "PagaDirectSample\Client\PagaDirectSample.Client.csproj", "{8BED05E8-14E7-4DAF-88BA-D05E83EE1235}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PagaDirectSample.Client", "PagaDirectSample\Client\PagaDirectSample.Client.csproj", "{8BED05E8-14E7-4DAF-88BA-D05E83EE1235}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagaDirectSample.Shared", "PagaDirectSample\Shared\PagaDirectSample.Shared.csproj", "{05CA08D9-FD38-45D2-9CFC-D8F9A6318352}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PagaDirectSample.Shared", "PagaDirectSample\Shared\PagaDirectSample.Shared.csproj", "{05CA08D9-FD38-45D2-9CFC-D8F9A6318352}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F881BC6-0DFC-4353-AD01-5F302223575E}"
 	ProjectSection(SolutionItems) = preProject
